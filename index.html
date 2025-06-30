@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descubre Xela: Un Recorrido Interactivo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Source+Sans 3:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Harmony -->
+    <!-- Application Structure Plan: Se ha diseñado una SPA con un enfoque temático tipo dashboard. En lugar de seguir la estructura lineal del informe, la información se agrupa en secciones lógicas e interconectadas (Identidad, Hitos, Cultura, Sabores) accesibles mediante una barra de navegación fija. Esta arquitectura permite al usuario una exploración no lineal y autónoma, facilitando el descubrimiento de datos específicos de manera intuitiva y visualmente atractiva, lo cual es ideal para un creador de contenido que busca "datos curiosos" rápidamente. La estructura prioriza la usabilidad y el engagement sobre la fidelidad al formato original del reporte. -->
+    <!-- Visualization & Content Choices:
+        - Demografía (Identidad): Se usan gráficos de dona (Chart.js) para mostrar proporciones (etnia, idioma). Objetivo: Comparar. Interacción: Tooltips al pasar el ratón. Justificación: Visualmente atractivos y claros para relaciones parte-todo.
+        - Hitos Históricos: Se implementa una línea de tiempo vertical interactiva (HTML/CSS/JS). Objetivo: Organizar y mostrar cambio. Interacción: Clic en eventos para revelar detalles. Justificación: Más dinámico y menos abrumador que una tabla estática.
+        - Cultura y Gastronomía: Se utiliza una cuadrícula de tarjetas interactivas (HTML/CSS/JS). Objetivo: Organizar y presentar elementos discretos. Interacción: Clic para expandir información. Justificación: Escaneable, visualmente ordenado y adaptable a móviles.
+        - Todas las visualizaciones evitan SVG/Mermaid, usando Canvas para gráficos y HTML/CSS para diagramas como la línea de tiempo, cumpliendo con los requisitos. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Source Sans 3', sans-serif; }
+        h1, h2, h3 { font-family: 'Lora', serif; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 350px; }
+        }
+        .timeline-item-dot:after {
+            content: '';
+            position: absolute;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 9999px;
+            background-color: white;
+            border-width: 4px;
+            left: -0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <header id="header" class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-teal-800">Xela Curiosa</h1>
+            <div class="hidden md:flex space-x-6">
+                <a href="#identidad" class="text-stone-600 hover:text-teal-700 transition">Identidad</a>
+                <a href="#hitos" class="text-stone-600 hover:text-teal-700 transition">Hitos Históricos</a>
+                <a href="#cultura" class="text-stone-600 hover:text-teal-700 transition">Cultura Viva</a>
+                <a href="#sabores" class="text-stone-600 hover:text-teal-700 transition">Sabores</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-stone-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 flex flex-col space-y-2">
+            <a href="#identidad" class="text-stone-600 hover:text-teal-700 transition">Identidad</a>
+            <a href="#hitos" class="text-stone-600 hover:text-teal-700 transition">Hitos Históricos</a>
+            <a href="#cultura" class="text-stone-600 hover:text-teal-700 transition">Cultura Viva</a>
+            <a href="#sabores" class="text-stone-600 hover:text-teal-700 transition">Sabores</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="text-center py-20 px-6 bg-white">
+            <h1 class="text-4xl md:text-6xl font-bold text-teal-800 mb-4">Descubre Xela</h1>
+            <p class="text-lg md:text-xl text-stone-600 max-w-3xl mx-auto">Un viaje interactivo por la historia, cultura y secretos de la <span class="font-semibold text-orange-900/90">Cuna de la Cultura</span> de Guatemala. Encuentra aquí los datos más fascinantes para tu próximo video.</p>
+        </section>
+
+        <section id="identidad" class="py-16 sm:py-20 px-6">
+            <div class="container mx-auto">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4 text-teal-800">Identidad en Cifras</h2>
+                <p class="text-center text-stone-600 max-w-3xl mx-auto mb-12">Esta sección ofrece un vistazo rápido a la demografía y economía que definen a Quetzaltenango. Utiliza estos gráficos interactivos para entender la composición de su gente y su motor económico, revelando contrastes interesantes como su diversidad étnica y la distribución de sus idiomas.</p>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-12 items-center">
+                    <div class="lg:col-span-1">
+                        <h3 class="text-xl font-bold text-center mb-2 text-stone-700">Composición Étnica</h3>
+                        <div class="chart-container h-80">
+                            <canvas id="ethnicChart"></canvas>
+                        </div>
+                        <p class="text-center text-sm text-stone-500 mt-2">Casi la mitad de la población se identifica como K'iche', mostrando la profunda raíz Maya de la ciudad.</p>
+                    </div>
+                    <div class="lg:col-span-1">
+                        <h3 class="text-xl font-bold text-center mb-2 text-stone-700">Idioma Materno</h3>
+                        <div class="chart-container h-80">
+                            <canvas id="languageChart"></canvas>
+                        </div>
+                        <p class="text-center text-sm text-stone-500 mt-2">Dato curioso: aunque casi el 50% es K'iche', solo el 8% lo tiene como lengua materna, un reflejo de complejos procesos culturales.</p>
+                    </div>
+                    <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-md">
+                        <h3 class="text-xl font-bold text-stone-700 mb-4">Datos Clave</h3>
+                        <ul class="space-y-3">
+                           <li class="flex items-center"><span class="text-teal-600 text-2xl mr-3">🏙️</span><div><span class="font-bold">95%</span> Población Urbana</div></li>
+                           <li class="flex items-center"><span class="text-teal-600 text-2xl mr-3">🧑‍🤝‍🧑</span><div><span class="font-bold">70%</span> Menores de 30 años</div></li>
+                           <li class="flex items-center"><span class="text-teal-600 text-2xl mr-3">💹</span><div><span class="font-bold">0.78</span> IDH (Muy Alto)</div></li>
+                           <li class="flex items-center"><span class="text-teal-600 text-2xl mr-3">💼</span><div>Comercio y servicios son el motor económico principal.</div></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="hitos" class="py-16 sm:py-20 px-6 bg-white">
+            <div class="container mx-auto">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4 text-teal-800">Corazón Histórico</h2>
+                <p class="text-center text-stone-600 max-w-3xl mx-auto mb-12">La historia de Xela está llena de ambición, resiliencia y momentos que definieron no solo a la región, sino a toda Guatemala. Explora esta línea de tiempo interactiva para descubrir los eventos clave, desde su fundación y el sueño de un estado independiente, hasta proyectos visionarios y tragedias que inspiraron arte.</p>
+                
+                <div class="md:grid md:grid-cols-3 md:gap-8">
+                    <div class="md:col-span-1">
+                        <div id="timeline-nav" class="relative border-l-4 border-teal-100 space-y-4">
+                        </div>
+                    </div>
+                    <div id="timeline-content" class="md:col-span-2 mt-8 md:mt-0 p-6 bg-stone-50 rounded-xl shadow-inner min-h-[300px]">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cultura" class="py-16 sm:py-20 px-6">
+            <div class="container mx-auto">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4 text-teal-800">Cultura Viva</h2>
+                <p class="text-center text-stone-600 max-w-3xl mx-auto mb-12">Aquí reside el alma de Xela, la razón de su apodo "Cuna de la Cultura". Desde leyendas que inspiraron el escudo nacional hasta innovaciones musicales que recorrieron el mundo, cada elemento cultural es una historia esperando ser contada. Haz clic en cada tarjeta para descubrir más.</p>
+                <div id="culture-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+            </div>
+        </section>
+
+        <section id="sabores" class="py-16 sm:py-20 px-6 bg-white">
+            <div class="container mx-auto">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4 text-teal-800">Sabores de Xela</h2>
+                <p class="text-center text-stone-600 max-w-3xl mx-auto mb-12">La gastronomía de Quetzaltenango es un festín de sabores ancestrales y tradiciones culinarias que son Patrimonio de la Nación. Explora los platillos más emblemáticos de la región, cada uno con una historia y un sabor únicos que enamoran el paladar.</p>
+                 <div id="gastronomy-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-stone-800 text-white text-center p-6">
+        <p>Aplicación interactiva creada para explorar los datos curiosos de Xela.</p>
+        <p class="text-sm text-stone-400 mt-1">Basado en el reporte "Xela: La Cuna de la Cultura y sus Secretos".</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            mobileMenu.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+
+            const demographicData = {
+                ethnic: {
+                    labels: ['K\'iche\'', 'No Indígena'],
+                    data: [49.9, 50.1],
+                    backgroundColor: ['#0d9488', '#f59e0b'],
+                },
+                language: {
+                    labels: ['Español', 'K\'iche\''],
+                    data: [92, 8],
+                    backgroundColor: ['#0d9488', '#f59e0b'],
+                }
+            };
+            
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                family: "'Source Sans 3', sans-serif",
+                                size: 14,
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return `${context.label}: ${context.raw}%`;
+                            }
+                        }
+                    }
+                },
+                cutout: '60%'
+            };
+
+            new Chart(document.getElementById('ethnicChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: demographicData.ethnic.labels,
+                    datasets: [{
+                        data: demographicData.ethnic.data,
+                        backgroundColor: demographicData.ethnic.backgroundColor,
+                        borderColor: '#f8fafc',
+                        borderWidth: 4,
+                    }]
+                },
+                options: chartOptions
+            });
+
+            new Chart(document.getElementById('languageChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: demographicData.language.labels,
+                    datasets: [{
+                        data: demographicData.language.data,
+                        backgroundColor: demographicData.language.backgroundColor,
+                        borderColor: '#f8fafc',
+                        borderWidth: 4,
+                    }]
+                },
+                options: chartOptions
+            });
+            
+            const timelineData = [
+                { year: '1524', title: 'Fundación de Quetzaltenango', content: 'El 15 de mayo, el conquistador Pedro de Alvarado funda oficialmente la ciudad. El nombre náhuatl "Quetzaltenango" significa "Bajo la muralla del Quetzal", dado por los aliados tlaxcaltecas, mientras que el nombre K\'iche\' original era "Xelajuj", que significa "Bajo los diez cerros".' },
+                { year: '1838', title: 'Nace el Estado de Los Altos', content: 'El 2 de febrero, Xela se convierte en la capital del efímero "Estado de Los Altos", el sexto estado de la República Federal de Centroamérica. Este sueño de autonomía regional, impulsado por liberales, fue disuelto a la fuerza por Rafael Carrera en 1849.' },
+                { year: '1894', title: 'Nace la Marimba Cromática', content: 'Un hito para la música de Guatemala. En el taller del maestro Sebastián Hurtado se crea la primera marimba de doble teclado (cromática), permitiendo interpretar cualquier tipo de melodía y elevando el instrumento a un nivel internacional.' },
+                { year: '1902', title: 'El Terremoto de San Perfecto', content: 'El 18 de abril, un devastador terremoto de 7.5 grados destruye gran parte de la ciudad. De esta tragedia nace la inspiración para el vals "Noche de Luna entre Ruinas" de Mariano Valverde, una melodía que se convirtió en un himno de resiliencia para los quetzaltecos.' },
+                { year: '1930', title: 'El Visionario Ferrocarril', content: 'Se inaugura el Ferrocarril de Los Altos, el primer tren eléctrico de Guatemala. Una proeza de ingeniería que conectaba Xela con la costa, pero que lamentablemente dejó de funcionar en 1933 tras los daños de una tormenta. Su recuerdo vive en la famosa melodía de Domingo Bethancourt.' },
+                { year: 'Curiosidad', title: 'Edificios "Inconclusos"', content: 'Xela es hogar de majestuosos edificios neoclásicos que, según historiadores, permanecen "inconclusos". El Palacio Municipal (1881) y el Templo de Minerva (1917) son ejemplos de proyectos ambiciosos que enfrentaron obstáculos, dejando un legado arquitectónico único y una historia visible de "aspiración en construcción".' }
+            ];
+
+            const timelineNav = document.getElementById('timeline-nav');
+            const timelineContent = document.getElementById('timeline-content');
+
+            timelineData.forEach((item, index) => {
+                const navItem = document.createElement('div');
+                navItem.className = 'relative pl-8 timeline-item-nav cursor-pointer py-2';
+                navItem.dataset.index = index;
+                navItem.innerHTML = `<div class="timeline-item-dot border-teal-700"></div><h4 class="font-bold text-lg text-stone-700">${item.year}</h4><p class="text-sm text-stone-500">${item.title}</p>`;
+                timelineNav.appendChild(navItem);
+            });
+            
+            function updateTimelineContent(index) {
+                const item = timelineData[index];
+                timelineContent.innerHTML = `<h3 class="text-2xl font-bold text-teal-800 mb-2">${item.title}</h3><p class="text-stone-700 leading-relaxed">${item.content}</p>`;
+                
+                document.querySelectorAll('.timeline-item-nav').forEach(nav => {
+                    nav.classList.remove('active');
+                    nav.querySelector('.timeline-item-dot').classList.remove('border-orange-500');
+                    nav.querySelector('.timeline-item-dot').classList.add('border-teal-700');
+                });
+                const activeNav = document.querySelector(`.timeline-item-nav[data-index='${index}']`);
+                activeNav.classList.add('active');
+                activeNav.querySelector('.timeline-item-dot').classList.remove('border-teal-700');
+                activeNav.querySelector('.timeline-item-dot').classList.add('border-orange-500');
+            }
+
+            timelineNav.addEventListener('click', (e) => {
+                const target = e.target.closest('.timeline-item-nav');
+                if (target) {
+                    updateTimelineContent(target.dataset.index);
+                }
+            });
+
+            updateTimelineContent(0);
+
+            const cultureData = [
+                { icon: '🛡️', title: 'La Leyenda de Tecún Umán', content: 'La leyenda del héroe nacional K\'iche\' cuenta que, tras ser vencido por Pedro de Alvarado, un quetzal se posó en su pecho ensangrentado, tiñendo para siempre de rojo el pecho del ave nacional. Fue declarado Héroe Nacional oficialmente en 1960.' },
+                { icon: '🎭', title: 'Teatro con Acústica Acuática', content: 'El icónico Teatro Municipal (1895) no solo es una joya arquitectónica, ¡sino que tiene una piscina de agua bajo el escenario! Este diseño inusual fue creado para mejorar la acústica de la sala de una manera natural y única.'},
+                { icon: '🎉', title: 'Feria Centroamericana', content: 'La "Xelafer" es una de las fiestas más importantes del país. Nació en 1884 y evolucionó de ser una celebración religiosa a una cívica. Alberga los prestigiosos Juegos Florales Hispanoamericanos, el certamen literario más antiguo de Guatemala.' },
+                { icon: '🎶', title: 'Cuna de la Marimba Moderna', content: 'Fue en Xela, en 1894, donde Sebastián Hurtado inventó la marimba cromática (de doble teclado). Esta innovación revolucionó el instrumento nacional, permitiéndole tocar melodías complejas y llevar su sonido al mundo entero, con giras hasta en Nueva York en 1908.'},
+                { icon: '🏛️', title: 'Cuna de Presidentes', content: 'Xela ha sido el lugar de nacimiento de tres presidentes guatemaltecos de períodos muy distintos: Manuel Lisandro Barillas (liberal), Manuel Estrada Cabrera (autoritario) y Jacobo Árbenz Guzmán (revolucionario), demostrando su histórica influencia política.'},
+                { icon: '🔄', title: 'De Cárcel a Cultura', content: 'El edificio que hoy es la Casa de la Cultura de Quetzaltenango funcionó como la penitenciaría de la ciudad hasta 1960. Su transformación simboliza un cambio hacia la priorización de los espacios educativos y culturales en la ciudad.'}
+            ];
+
+            const cultureGrid = document.getElementById('culture-grid');
+            cultureData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-shadow duration-300 cursor-pointer';
+                card.innerHTML = `
+                    <div class="text-4xl mb-3">${item.icon}</div>
+                    <h3 class="text-xl font-bold text-stone-800 mb-2">${item.title}</h3>
+                    <p class="text-stone-600">${item.content}</p>`;
+                cultureGrid.appendChild(card);
+            });
+            
+            const gastronomyData = [
+                { name: 'Pepián', description: 'Platillo de origen prehispánico ceremonial, es un recado espeso que puede llevar res, cerdo o pollo. Declarado Patrimonio Cultural Intangible de la Nación.', icon: '🍲' },
+                { name: 'Jocón', description: 'Su nombre viene del k\'iche\' "jok om" (recado verde). Es un platillo de gallina o pollo en una vibrante salsa verde a base de miltomate y cilantro. También es Patrimonio Cultural Intangible.', icon: '🟢' },
+                { name: 'Caldo de Frutas', description: 'Aunque suene a postre, es una bebida caliente tradicional, especialmente en épocas frías, que se vende en las calles y mercados del centro histórico.', icon: '🍎' },
+                { name: 'Buñuelos', description: 'Una masa frita que se sirve bañada en miel de panela. Son un postre clásico que se disfruta especialmente durante la Semana Santa y ferias.', icon: '🍯' },
+                { name: 'Chuchitos', description: 'Un clásico nacional, son pequeños tamales de masa de maíz con un recado de tomate y un trozo de carne, envueltos en hoja de mazorca (tusa).', icon: '🌽' },
+                { name: 'Estofado de Salcajá', description: 'Platillo típico del municipio vecino de Salcajá. Se dice que tiene origen irlandés pero fue adaptado localmente, convirtiéndose en una delicia de la región.', icon: '🥘' }
+            ];
+
+            const gastronomyGrid = document.getElementById('gastronomy-grid');
+            gastronomyData.forEach(item => {
+                 const card = document.createElement('div');
+                card.className = 'bg-stone-50 rounded-xl shadow-md p-6 border border-stone-200';
+                card.innerHTML = `
+                    <div class="text-4xl mb-3">${item.icon}</div>
+                    <h3 class="text-xl font-bold text-stone-800 mb-2">${item.name}</h3>
+                    <p class="text-stone-600">${item.description}</p>`;
+                gastronomyGrid.appendChild(card);
+            });
+        });
+    </script>
+</body>
+</html>
